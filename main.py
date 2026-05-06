@@ -3,25 +3,31 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
+
+# === Create output folder first ===
+os.makedirs("output", exist_ok=True)
 
 # === 10 French & Gaming-related stocks ===
+# Replaced delisted: GFT.PA, ATA.PA, DLT.PA, ALVIV.PA
+# with: METAV.PA (XR Metaverse), HO.PA (Thales), ORA.PA (Orange), SGO.PA (Saint-Gobain)
 tickers = {
     "UBI.PA":   "Ubisoft",
     "NACON.PA": "Nacon",
     "BIG.PA":   "Bigben Interactive",
     "ALDNE.PA": "Dontnod Entertainment",
     "GUI.PA":   "Guillemot",
-    "GFT.PA":   "Gameloft",
-    "ATA.PA":   "Atari",
     "FNAC.PA":  "Fnac Darty",
-    "DLT.PA":   "Dalet",
-    "ALVIV.PA": "Visiativ"
+    "HO.PA":    "Thales",
+    "ORA.PA":   "Orange",
+    "SGO.PA":   "Saint-Gobain",
+    "RNO.PA":   "Renault"
 }
 
 START = "2022-01-01"
 END   = "2024-12-31"
 INVESTMENT = 10_000  # EUR
-RISK_FREE  = 0.03    # 3% annual risk-free rate
+RISK_FREE  = 0.03    # 3% annual risk-free rate (ECB reference)
 
 # === Download data ===
 print("Downloading data...")
@@ -42,22 +48,19 @@ for col in returns.columns:
     var95      = np.percentile(r, 5) * INVESTMENT
     var99      = np.percentile(r, 1) * INVESTMENT
     results.append({
-        "Stock":           col,
-        "Ann. Return (%)" : round(ann_return * 100, 2),
-        "Volatility (%)" : round(ann_vol    * 100, 2),
-        "Sharpe Ratio":    round(sharpe,             3),
-        "VaR 95% (EUR)":   round(var95,              2),
-        "VaR 99% (EUR)":   round(var99,              2)
+        "Stock":          col,
+        "Ann. Return (%)": round(ann_return * 100, 2),
+        "Volatility (%)": round(ann_vol    * 100, 2),
+        "Sharpe Ratio":   round(sharpe,            3),
+        "VaR 95% (EUR)":  round(var95,             2),
+        "VaR 99% (EUR)":  round(var99,             2)
     })
 
 df = pd.DataFrame(results).sort_values("Sharpe Ratio", ascending=False)
 print("\n=== Portfolio Metrics ===")
 print(df.to_string(index=False))
 df.to_csv("output/metrics.csv", index=False)
-
-import os
-os.makedirs("output", exist_ok=True)
-df.to_csv("output/metrics.csv", index=False)
+print("Metrics saved.")
 
 # === Chart 1: Cumulative Returns ===
 cumulative = (1 + returns).cumprod()
@@ -78,7 +81,7 @@ print("Chart 1 saved.")
 df_sorted = df.sort_values("Sharpe Ratio")
 colors = ["#2ecc71" if x > 0 else "#e74c3c" for x in df_sorted["Sharpe Ratio"]]
 plt.figure(figsize=(10, 6))
-bars = plt.barh(df_sorted["Stock"], df_sorted["Sharpe Ratio"], color=colors)
+plt.barh(df_sorted["Stock"], df_sorted["Sharpe Ratio"], color=colors)
 plt.axvline(0, color="black", linewidth=0.8, linestyle="--")
 plt.title("Sharpe Ratio by Stock", fontsize=15)
 plt.xlabel("Sharpe Ratio")
