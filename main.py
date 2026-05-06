@@ -5,12 +5,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 
-# === Create output folder first ===
+# === Create output folder ===
 os.makedirs("output", exist_ok=True)
 
 # === 10 French & Gaming-related stocks ===
-# Replaced delisted: GFT.PA, ATA.PA, DLT.PA, ALVIV.PA
-# with: METAV.PA (XR Metaverse), HO.PA (Thales), ORA.PA (Orange), SGO.PA (Saint-Gobain)
 tickers = {
     "UBI.PA":   "Ubisoft",
     "NACON.PA": "Nacon",
@@ -60,7 +58,7 @@ df = pd.DataFrame(results).sort_values("Sharpe Ratio", ascending=False)
 print("\n=== Portfolio Metrics ===")
 print(df.to_string(index=False))
 df.to_csv("output/metrics.csv", index=False)
-print("Metrics saved.")
+print("Metrics saved to output/metrics.csv")
 
 # === Chart 1: Cumulative Returns ===
 cumulative = (1 + returns).cumprod()
@@ -74,8 +72,8 @@ plt.legend(fontsize=8)
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.savefig("output/cumulative_returns.png", dpi=150)
-plt.close()
-print("Chart 1 saved.")
+plt.show()  # display inline in PyCharm
+print("Chart 1 done.")
 
 # === Chart 2: Sharpe Ratio Bar Chart ===
 df_sorted = df.sort_values("Sharpe Ratio")
@@ -88,8 +86,8 @@ plt.xlabel("Sharpe Ratio")
 plt.grid(True, axis="x", alpha=0.3)
 plt.tight_layout()
 plt.savefig("output/sharpe_ratio.png", dpi=150)
-plt.close()
-print("Chart 2 saved.")
+plt.show()  # display inline in PyCharm
+print("Chart 2 done.")
 
 # === Chart 3: Correlation Heatmap ===
 plt.figure(figsize=(10, 8))
@@ -98,7 +96,7 @@ sns.heatmap(returns.corr(), annot=True, fmt=".2f", cmap="RdYlGn",
 plt.title("Correlation Matrix of Daily Returns", fontsize=15)
 plt.tight_layout()
 plt.savefig("output/correlation_heatmap.png", dpi=150)
-plt.close()
-print("Chart 3 saved.")
+plt.show()  # display inline in PyCharm
+print("Chart 3 done.")
 
-print("\nAll charts and metrics saved in /output folder.")
+print("\nAll charts displayed and saved in /output folder.")
